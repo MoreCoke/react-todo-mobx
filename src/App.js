@@ -1,14 +1,14 @@
 import React from 'react';
 import './App.css';
-import Todo from './components/TodoItem';
+import TodoItem from './components/TodoItem';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      renderTodos: [],
       todos: [],
       text: '',
+      isCompleted: false,
     };
     this.addTodo = this.addTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
@@ -20,7 +20,7 @@ class App extends React.Component {
   }
 
   addTodo() {
-    const { renderTodos, todos, text } = this.state;
+    const { todos, text } = this.state;
     this.setState({
       text: '',
       editText: '',
@@ -34,45 +34,18 @@ class App extends React.Component {
           id: new Date().getTime(),
         },
       ],
-      renderTodos: [
-        ...renderTodos,
-        {
-          text: text,
-          isCompleted: false,
-          isEdited: false,
-          id: new Date().getTime(),
-        },
-      ],
     });
   }
   deleteTodo(id) {
-    const { renderTodos, todos } = this.state;
+    const { todos } = this.state;
     this.setState({
       todos: todos.filter((element) => element['id'] !== id),
-      renderTodos: renderTodos.filter((element) => element['id'] !== id),
     });
   }
   editTodo(id) {
-    const { renderTodos, todos, editText } = this.state;
+    const { todos, editText } = this.state;
     let data = '';
     this.setState({
-      renderTodos: renderTodos.map((element) => {
-        if (element['id'] !== id) {
-          return element;
-        }
-        data = element.text;
-        if(editText) {
-          return {
-            ...element,
-            text: editText,
-            isEdited: !element.isEdited,
-          };
-        }
-        return {
-          ...element,
-          isEdited: !element.isEdited,
-        };
-      }),
       todos: todos.map((element) => {
         if (element['id'] !== id) {
           return element;
@@ -104,18 +77,9 @@ class App extends React.Component {
     })
   }
   doneTodo(id) {
-    const { todos, renderTodos } = this.state;
+    const { todos } = this.state;
     this.setState({
       todos: todos.map((element) => {
-        if (element['id'] !== id) {
-          return element;
-        }
-        return {
-          ...element,
-          isCompleted: !element.isCompleted,
-        };
-      }),
-      renderTodos: renderTodos.map((element) => {
         if (element['id'] !== id) {
           return element;
         }
@@ -128,21 +92,43 @@ class App extends React.Component {
   }
 
   allTodo() {
-    const { todos } = this.state;
     this.setState({
-      renderTodos: [...todos],
+      isCompleted: false,
     });
   }
 
   allDoneTodo() {
-    const { todos } = this.state;
     this.setState({
-      renderTodos: todos.filter((element) => element['isCompleted']),
+      isCompleted: true,
     });
   }
 
+  renderTodoItems() {
+    const { todos, isCompleted} = this.state;
+    
+    return (
+      todos
+      .filter((element) => {
+        return isCompleted ? element['isCompleted']: true;
+      })
+      .map((element) => {
+        return (
+          <TodoItem
+            task={element}
+            del={() => this.deleteTodo(element['id'])}
+            toggleBoolean={() => this.doneTodo(element['id'])}
+            update={(evt) => this.updateEditInputValue(evt)}
+            edit={() => this.editTodo(element['id'])}
+            editText={this.state.editText}
+            key={element['id']}
+          />
+        );
+      })
+    )
+  }
+
   render() {
-    const { renderTodos, text } = this.state;
+    const { text } = this.state;
     return (
       <div>
         <input
@@ -152,19 +138,7 @@ class App extends React.Component {
         />
         <button onClick={this.addTodo}>新增</button>
         <ul className="list">
-          {renderTodos.map((element) => {
-            return (
-              <Todo
-                task={element}
-                del={() => this.deleteTodo(element['id'])}
-                toggleBoolean={() => this.doneTodo(element['id'])}
-                update={(evt) => this.updateEditInputValue(evt)}
-                edit={() => this.editTodo(element['id'])}
-                editText={this.state.editText}
-                key={element['id']}
-              />
-            );
-          })}
+          {this.renderTodoItems()}
         </ul>
         <button onClick={this.allTodo}>全部</button>
         <button onClick={this.allDoneTodo}>已完成</button>

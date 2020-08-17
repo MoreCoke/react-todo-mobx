@@ -11,7 +11,6 @@ class App extends React.Component {
       isCompleted: false,
       test: 123
     };
-    this.allDoneTodo = this.allDoneTodo.bind(this);
   }
 
   addTodo = () => {

@@ -9,17 +9,12 @@ class App extends React.Component {
       todos: [],
       text: '',
       isCompleted: false,
+      test: 123
     };
-    this.addTodo = this.addTodo.bind(this);
-    this.deleteTodo = this.deleteTodo.bind(this);
-    this.updateAddInputValue = this.updateAddInputValue.bind(this);
-    this.updateEditInputValue = this.updateEditInputValue.bind(this);
-    this.doneTodo = this.doneTodo.bind(this);
-    this.allTodo = this.allTodo.bind(this);
     this.allDoneTodo = this.allDoneTodo.bind(this);
   }
 
-  addTodo() {
+  addTodo = () => {
     const { todos, text } = this.state;
     this.setState({
       text: '',
@@ -36,13 +31,13 @@ class App extends React.Component {
       ],
     });
   }
-  deleteTodo(id) {
+  deleteTodo = (id) => {
     const { todos } = this.state;
     this.setState({
       todos: todos.filter((element) => element['id'] !== id),
     });
   }
-  editTodo(id) {
+  editTodo = (id) => {
     const { todos, editText } = this.state;
     let data = '';
     this.setState({
@@ -66,17 +61,17 @@ class App extends React.Component {
       currentTodoText: data,
     });
   }
-  updateAddInputValue(evt) {
+  updateAddInputValue = (evt) => {
     this.setState({
       text: evt.target.value,
     });
   }
-  updateEditInputValue(evt) {
+  updateEditInputValue = (evt) => {
     this.setState({
         editText: evt.target.value,
     })
   }
-  doneTodo(id) {
+  doneTodo = (id) => {
     const { todos } = this.state;
     this.setState({
       todos: todos.map((element) => {
@@ -91,13 +86,13 @@ class App extends React.Component {
     });
   }
 
-  allTodo() {
+  allTodo = () => {
     this.setState({
       isCompleted: false,
     });
   }
 
-  allDoneTodo() {
+  allDoneTodo = () => {
     this.setState({
       isCompleted: true,
     });

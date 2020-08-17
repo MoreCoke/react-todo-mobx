@@ -1,7 +1,10 @@
 import React from 'react';
 import './App.css';
 import TodoItem from './components/TodoItem';
+import {observer} from 'mobx-react';
+import {observable} from 'mobx';
 
+@observer
 class App extends React.Component {
   constructor(props) {
     super(props);

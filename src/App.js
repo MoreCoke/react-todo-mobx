@@ -1,8 +1,8 @@
-import React from 'react';
-import './App.css';
-import TodoItem from './components/TodoItem';
-import {observer} from 'mobx-react';
-import {observable} from 'mobx';
+import React from "react";
+import "./App.css";
+import TodoItem from "./components/TodoItem";
+import { observer } from "mobx-react";
+import { observable } from "mobx";
 
 @observer
 class App extends React.Component {
@@ -10,18 +10,19 @@ class App extends React.Component {
     super(props);
     this.state = {
       todos: [],
-      text: '',
+      editText: "",
+      text: "",
       isCompleted: false,
-      test: 123
+      test: 123,
     };
   }
 
   addTodo = () => {
     const { todos, text } = this.state;
     this.setState({
-      text: '',
-      editText: '',
-      currentTodoText:'',
+      text: "",
+      editText: "",
+      currentTodoText: "",
       todos: [
         ...todos,
         {
@@ -32,22 +33,21 @@ class App extends React.Component {
         },
       ],
     });
-  }
+  };
   deleteTodo = (id) => {
     const { todos } = this.state;
     this.setState({
-      todos: todos.filter((element) => element['id'] !== id),
+      todos: todos.filter((element) => element["id"] !== id),
     });
-  }
+  };
   editTodo = (id) => {
     const { todos, editText } = this.state;
-    let data = '';
     this.setState({
       todos: todos.map((element) => {
-        if (element['id'] !== id) {
+        if (element["id"] !== id) {
           return element;
         }
-        if(editText) {
+        if (editText) {
           return {
             ...element,
             text: editText,
@@ -59,25 +59,24 @@ class App extends React.Component {
           isEdited: !element.isEdited,
         };
       }),
-      editText: '',
-      currentTodoText: data,
+      editText: "",
     });
-  }
+  };
   updateAddInputValue = (evt) => {
     this.setState({
       text: evt.target.value,
     });
-  }
+  };
   updateEditInputValue = (evt) => {
     this.setState({
-        editText: evt.target.value,
-    })
-  }
+      editText: evt.target.value,
+    });
+  };
   doneTodo = (id) => {
     const { todos } = this.state;
     this.setState({
       todos: todos.map((element) => {
-        if (element['id'] !== id) {
+        if (element["id"] !== id) {
           return element;
         }
         return {
@@ -86,42 +85,40 @@ class App extends React.Component {
         };
       }),
     });
-  }
+  };
 
   allTodo = () => {
     this.setState({
       isCompleted: false,
     });
-  }
+  };
 
   allDoneTodo = () => {
     this.setState({
       isCompleted: true,
     });
-  }
+  };
 
   renderTodoItems() {
-    const { todos, isCompleted} = this.state;
-    
-    return (
-      todos
+    const { todos, isCompleted, editText } = this.state;
+
+    return todos
       .filter((element) => {
-        return isCompleted ? element['isCompleted']: true;
+        return isCompleted ? element["isCompleted"] : true;
       })
       .map((element) => {
         return (
           <TodoItem
             task={element}
-            del={() => this.deleteTodo(element['id'])}
-            toggleBoolean={() => this.doneTodo(element['id'])}
+            del={() => this.deleteTodo(element["id"])}
+            toggleBoolean={() => this.doneTodo(element["id"])}
             update={(evt) => this.updateEditInputValue(evt)}
-            edit={() => this.editTodo(element['id'])}
-            editText={this.state.editText}
-            key={element['id']}
+            edit={() => this.editTodo(element["id"])}
+            editText={editText}
+            key={element["id"]}
           />
         );
-      })
-    )
+      });
   }
 
   render() {
@@ -134,9 +131,7 @@ class App extends React.Component {
           onChange={(evt) => this.updateAddInputValue(evt)}
         />
         <button onClick={this.addTodo}>新增</button>
-        <ul className="list">
-          {this.renderTodoItems()}
-        </ul>
+        <ul className="list">{this.renderTodoItems()}</ul>
         <button onClick={this.allTodo}>全部</button>
         <button onClick={this.allDoneTodo}>已完成</button>
       </div>

@@ -2,132 +2,83 @@ import React from "react";
 import "./App.css";
 import TodoItem from "./components/TodoItem";
 import { observer } from "mobx-react";
-import { observable } from "mobx";
+import { observable, action, computed } from "mobx";
 
 @observer
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      todos: [],
-      editText: "",
-      text: "",
-      isCompleted: false,
-      test: 123,
+  @observable todos = [];
+  @observable editText = "";
+  @observable text = "";
+  @observable allCompleted = false;
+
+  @action addTodo = () => {
+    const todo = {
+      text: this.text,
+      allCompleted: false,
+      isEdited: false,
+      id: new Date().getTime(),
     };
+    this.todos.push(todo);
+    this.text = "";
+  };
+  @action deleteTodo = (id) => {
+    this.todos = this.todos.filter((element) => element["id"] !== id);
+  };
+  @action editTodo = (id) => {
+    const index = this.todos.map((element) => element.id).indexOf(id);
+    if (this.editText) {
+      this.todos[index].text = this.editText;
+      this.editText = "";
+    }
+    this.todos[index].isEdited = !this.todos[index].isEdited;
+  };
+  @action updateAddInputValue = (evt) => {
+    this.text = evt.target.value;
+  };
+  @action updateEditInputValue = (evt) => {
+    this.editText = evt.target.value;
+  };
+  @action doneTodo = (id) => {
+    const index = this.todos.map((element) => element.id).indexOf(id);
+    this.todos[index].isCompleted = !this.todos[index].isCompleted;
+  };
+
+  @action allTodo = () => {
+    this.allCompleted = false;
+  };
+
+  @action allDoneTodo = () => {
+    this.allCompleted = true;
+  };
+
+  @computed get todoItems() {
+    return this.todos.filter((element) => {
+      return this.allCompleted ? element["isCompleted"] : true;
+    });
   }
 
-  addTodo = () => {
-    const { todos, text } = this.state;
-    this.setState({
-      text: "",
-      editText: "",
-      currentTodoText: "",
-      todos: [
-        ...todos,
-        {
-          text: text,
-          isCompleted: false,
-          isEdited: false,
-          id: new Date().getTime(),
-        },
-      ],
-    });
-  };
-  deleteTodo = (id) => {
-    const { todos } = this.state;
-    this.setState({
-      todos: todos.filter((element) => element["id"] !== id),
-    });
-  };
-  editTodo = (id) => {
-    const { todos, editText } = this.state;
-    this.setState({
-      todos: todos.map((element) => {
-        if (element["id"] !== id) {
-          return element;
-        }
-        if (editText) {
-          return {
-            ...element,
-            text: editText,
-            isEdited: !element.isEdited,
-          };
-        }
-        return {
-          ...element,
-          isEdited: !element.isEdited,
-        };
-      }),
-      editText: "",
-    });
-  };
-  updateAddInputValue = (evt) => {
-    this.setState({
-      text: evt.target.value,
-    });
-  };
-  updateEditInputValue = (evt) => {
-    this.setState({
-      editText: evt.target.value,
-    });
-  };
-  doneTodo = (id) => {
-    const { todos } = this.state;
-    this.setState({
-      todos: todos.map((element) => {
-        if (element["id"] !== id) {
-          return element;
-        }
-        return {
-          ...element,
-          isCompleted: !element.isCompleted,
-        };
-      }),
-    });
-  };
-
-  allTodo = () => {
-    this.setState({
-      isCompleted: false,
-    });
-  };
-
-  allDoneTodo = () => {
-    this.setState({
-      isCompleted: true,
-    });
-  };
-
   renderTodoItems() {
-    const { todos, isCompleted, editText } = this.state;
-
-    return todos
-      .filter((element) => {
-        return isCompleted ? element["isCompleted"] : true;
-      })
-      .map((element) => {
-        return (
-          <TodoItem
-            task={element}
-            del={() => this.deleteTodo(element["id"])}
-            toggleBoolean={() => this.doneTodo(element["id"])}
-            update={(evt) => this.updateEditInputValue(evt)}
-            edit={() => this.editTodo(element["id"])}
-            editText={editText}
-            key={element["id"]}
-          />
-        );
-      });
+    return this.todoItems.map((element) => {
+      return (
+        <TodoItem
+          task={element}
+          del={() => this.deleteTodo(element["id"])}
+          toggleBoolean={() => this.doneTodo(element["id"])}
+          update={(evt) => this.updateEditInputValue(evt)}
+          edit={() => this.editTodo(element["id"])}
+          editText={this.editText}
+          key={element["id"]}
+        />
+      );
+    });
   }
 
   render() {
-    const { text } = this.state;
     return (
       <div>
         <input
           type="text"
-          value={text}
+          value={this.text}
           onChange={(evt) => this.updateAddInputValue(evt)}
         />
         <button onClick={this.addTodo}>新增</button>
